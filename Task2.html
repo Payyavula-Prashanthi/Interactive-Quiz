@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simple Quiz</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: paleturquoise;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 50px auto;
+      padding: 20px;
+      background-color: grey;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      position: relative;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    #quiz-container {
+      margin-bottom: 20px;
+    }
+
+    .question {
+      margin-bottom: 10px;
+    }
+
+    .option {
+      cursor: pointer;
+      margin-bottom: 5px;
+      padding: 8px;
+      border-radius: 5px;
+    }
+
+    .option:hover {
+      background-color: #f0f0f0;
+    }
+
+    .selected {
+      background-color: greenyellow;
+    }
+
+    #submit-btn {
+      display: block;
+      margin: 0 auto;
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    #submit-btn:hover {
+      background-color: #45a049;
+    }
+
+    .warning {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: #ffcccc;
+      padding: 10px 20px;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+      z-index: 9999;
+      display: none;
+    }
+
+    .congratulations {
+      text-align: center;
+      display: none;
+    }
+
+    .congratulations h1 {
+      color: #4CAF50;
+    }
+
+    .congratulations p {
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Simple Quiz</h1>
+    <ul id="quiz-container"></ul>
+    <button id="submit-btn">Submit</button>
+    <div id="result"></div>
+    <div class="warning" id="warning-msg">Please answer all questions before submitting.</div>
+    <div class="congratulations" id="congratulations-msg">
+      <h1>Congratulations!</h1>
+      <div id="score"></div>
+    </div>
+  </div>
+
+  <script>
+    const quizContainer = document.getElementById('quiz-container');
+    const submitButton = document.getElementById('submit-btn');
+    const resultContainer = document.getElementById('result');
+    const warningMsg = document.getElementById('warning-msg');
+    const congratulationsMsg = document.getElementById('congratulations-msg');
+    const scoreContainer = document.getElementById('score');
+
+    const questions = [
+      {
+        question: "What is the capital of France?",
+        options: ["Paris", "London", "Rome", "Berlin"],
+        answer: "Paris"
+      },
+      {
+        question: "What is 2 + 2?",
+        options: ["3", "4", "5", "6"],
+        answer: "4"
+      },
+      {
+        question: "Which planet is known as the Red Planet?",
+        options: ["Mars", "Venus", "Jupiter", "Saturn"],
+        answer: "Mars"
+      }
+    ];
+
+    function createQuiz() {
+      questions.forEach((question, index) => {
+        const questionItem = document.createElement('li');
+        questionItem.classList.add('question');
+        questionItem.innerHTML = `<p>${index + 1}. ${question.question}</p>`;
+        const optionsList = document.createElement('ul');
+        question.options.forEach((option, optionIndex) => {
+          const optionItem = document.createElement('li');
+          optionItem.classList.add('option');
+          optionItem.textContent = option;
+          optionItem.addEventListener('click', () => selectOption(index, optionIndex));
+          optionsList.appendChild(optionItem);
+        });
+        questionItem.appendChild(optionsList);
+        quizContainer.appendChild(questionItem);
+      });
+    }
+
+    let selectedOptions = new Array(questions.length).fill(null);
+
+    function selectOption(questionIndex, optionIndex) {
+      selectedOptions[questionIndex] = optionIndex;
+      const options = document.querySelectorAll(`#quiz-container li:nth-child(${questionIndex + 1}) .option`);
+      options.forEach((option, index) => {
+        if (index === optionIndex) {
+          option.classList.add('selected');
+        } else {
+          option.classList.remove('selected');
+        }
+      });
+    }
+
+    submitButton.addEventListener('click', () => {
+      if (selectedOptions.includes(null)) {
+        warningMsg.style.display = 'block';
+        setTimeout(() => {
+          warningMsg.style.display = 'none';
+        }, 3000);
+      } else {
+        calculateScore();
+      }
+    });
+
+    function calculateScore() {
+      let score = 0;
+      selectedOptions.forEach((selectedOption, questionIndex) => {
+        const correctOptionIndex = questions[questionIndex].options.findIndex(option => option === questions[questionIndex].answer);
+        if (selectedOption === correctOptionIndex) {
+          score++;
+        }
+      });
+      resultContainer.textContent = `Your score: ${score} out of ${questions.length}`;
+      scoreContainer.textContent = `Your score: ${score} out of ${questions.length}`;
+      quizContainer.style.display = 'none';
+      congratulationsMsg.style.display = 'block';
+    }
+
+    createQuiz();
+  </script>
+</body>
+</html>
